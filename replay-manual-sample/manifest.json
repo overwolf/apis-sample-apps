@@ -1,0 +1,52 @@
+{
+  "manifest_version": 1,
+  "type": "WebApp",
+  "meta": {
+    "name": "Replay Manual Sample App",
+    "version": "1.0.0",
+    "minimum-overwolf-version": "0.165.0",
+    "author": "Overwolf",
+    "icon": "icons/IconMouseOver.png",
+    "icon_gray": "icons/IconMouseNormal.png",
+    "launcher_icon": "icons/launcher.ico",
+    "window_icon": "icons/IconMouseOver.png",
+    "description": ""
+  },
+  "permissions": [
+    "Extensions",
+    "FileSystem",
+    "Streaming",
+    "DesktopStreaming"
+  ],
+  "data": {
+    "start_window": "background",
+    "windows": {
+      "background": {
+        "file": "background.html",
+        "is_background_page": true,
+        "background_optimization": false,
+        "allow_local_file_access": true
+      },
+      "main": {
+        "file": "main.html",
+        "transparent": false,
+        "resizable": true,
+        "show_in_taskbar": true,
+        "keep_window_location": true,
+        "override_on_update": true,
+        "size": {
+          "width": 640,
+          "height": 360
+        },
+        "min_size": {
+          "width": 480,
+          "height": 220
+        },
+        "start_position": {
+          "top": 300,
+          "left": 300
+        }
+      }
+    }
+  }
+}

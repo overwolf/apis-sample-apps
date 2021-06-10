@@ -16,10 +16,15 @@ async function turnOnReplays() {
 
   const autoHighlightsSupported = await checkAutoHighlightsSupport();
 
+  if (!autoHighlightsSupported) {
+    console.log('turnOnReplays(): auto-highlights not supported, cannot turn on replay API');
+    return;
+  }
+
   const parameters = {
     settings: streamSettings,
     highlights: {
-      enable: autoHighlightsSupported, // set to false if you want to record the highlights manually
+      enable: true,
       requiredHighlights : ['*'] // events to capture. we want to capture all events
     }
   };
@@ -104,53 +109,10 @@ function getReplayState() {
   });
 }
 
-// Capture a replay of past 20 and future 5 seconds
-function capture() {
-  if ( !turnedOn ) {
-    console.log('capture(): replays turned off, you need to turn on replay API first');
-    return;
-  }
-
-  const
-    pastDuration = 20000,
-    futureDuration = 5000;
-
-  const callback = result => {
-    if (result.success) {
-      console.log('overwolf.media.replays.capture(): started capturing:', result);
-    } else {
-      console.log(
-        'overwolf.media.replays.capture(): callback error:',
-        result.error,
-        result
-      );
-    }
-  };
-
-  const captureFinishedCallback = result => {
-    if (result.success) {
-      console.log('overwolf.media.replays.capture(): finished successfully:', result);
-    } else {
-      console.log(
-        'overwolf.media.replays.capture(): captureFinishedCallback error:',
-        result.error,
-        result
-      );
-    }
-  };
-
-  overwolf.media.replays.capture(
-    pastDuration,
-    futureDuration,
-    captureFinishedCallback,
-    callback
-  );
-}
-
 // Open the media folder in Explorer
 function openFolder() {
   overwolf.utils.openWindowsExplorer(
-    'overwolf://media/replays/Replay+Sample+App',
+    'overwolf://media/replays/Replay+Auto+Highlights+Sample+App',
     result => console.log('overwolf.utils.openWindowsExplorer():', result)
   );
 }
@@ -173,7 +135,6 @@ function openMainWindow() {
 window.turnOnReplays = turnOnReplays;
 window.turnOffReplays = turnOffReplays;
 window.getReplayState = getReplayState;
-window.capture = capture;
 window.openFolder = openFolder;
 window.openConsole = openConsole;
 
