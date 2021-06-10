@@ -9,7 +9,7 @@ let turnedOn = false;
 
 // Turn on replays
 async function turnOnReplays() {
-  if ( turnedOn ) {
+  if (turnedOn) {
     console.log('turnOnReplays(): replays already turned on');
     return;
   }
@@ -71,7 +71,7 @@ async function checkAutoHighlightsSupport() {
 
 // Turn off replays
 function turnOffReplays() {
-  if ( !turnedOn ) {
+  if (!turnedOn) {
     console.log('turnOffReplays(): replays already turned off');
     return;
   }
@@ -151,7 +151,7 @@ function capture() {
 function openFolder() {
   overwolf.utils.openWindowsExplorer(
     'overwolf://media/replays/Replay+Sample+App',
-    e => console.log('overwolf.utils.openWindowsExplorer():', e)
+    result => console.log('overwolf.utils.openWindowsExplorer():', result)
   );
 }
 
@@ -164,7 +164,7 @@ function openConsole() {
 // Opens the UI window
 function openMainWindow() {
   overwolf.windows.obtainDeclaredWindow('main', result => {
-    if ( result.success && result.window && result.window.id ) {
+    if (result.success && result.window && result.window.id) {
       overwolf.windows.restore(result.window.id, null);
     }
   });

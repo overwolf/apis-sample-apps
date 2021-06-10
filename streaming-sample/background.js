@@ -15,7 +15,7 @@ let streamId = null;
 
 // Starts the stream
 function startRecording() {
-  if ( streamId !== null ) {
+  if (streamId !== null) {
     console.log('startRecording(): can\'t start recording because there a stream already recording');
     return;
   }
@@ -35,7 +35,7 @@ function startRecording() {
 
 // Stops the stream
 function stopRecording() {
-  if ( streamId === null ) {
+  if (streamId === null) {
     console.log('stopRecording(): can\'t stop recording because there is no stream recording');
     return;
   }
@@ -54,7 +54,7 @@ function stopRecording() {
 function openFolder() {
   overwolf.utils.openWindowsExplorer(
     'overwolf://media/recordings/Streaming+Sample+App',
-    e => console.log('overwolf.utils.openWindowsExplorer():', e)
+    result => console.log('overwolf.utils.openWindowsExplorer():', result)
   );
 }
 
@@ -67,7 +67,7 @@ function openConsole() {
 // Opens the UI window
 function openMainWindow() {
   overwolf.windows.obtainDeclaredWindow('main', result => {
-    if ( result.success && result.window && result.window.id ) {
+    if (result.success && result.window && result.window.id) {
       overwolf.windows.restore(result.window.id, null);
     }
   });
