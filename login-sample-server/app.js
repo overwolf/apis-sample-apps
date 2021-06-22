@@ -18,7 +18,7 @@ const DEFAULT_PORT = 3000;
 const PORT = parseInt(process.env.PORT || DEFAULT_PORT);
 
 const DEFAULT_HOST = 'localhost';
-const HOST = `${process.env.HOST || DEFAULT_HOST}:${PORT}`;
+const HOST = process.env.HOST || DEFAULT_HOST;
 
 const socketConnections = new Map();
 const usersStore = new Map();
@@ -60,7 +60,7 @@ const strategy = new SteamStrategy(
 passport.use(strategy);
 
 const sessionParser = session({
-  secret: 'epsteinalive',
+  secret: 'lorem ipsum',
   name: 'sid',
   resave: false,
   saveUninitialized: false

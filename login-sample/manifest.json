@@ -22,7 +22,8 @@
     "start_window": "background",
     "externally_connectable": {
       "matches": [
-        "http://localhost"
+        "http://localhost",
+        "https://social-login-sample-server.overwolf.com"
       ]
     },
     "windows": {

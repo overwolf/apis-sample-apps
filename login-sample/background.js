@@ -1,13 +1,13 @@
 const
-  PROTOCOL = 'http',
-  HOST = 'sso-sample-server.overwolf.com', // 'localhost'
-  API_URL = `${PROTOCOL}://${HOST}:3000`,
-  WS_URL = `ws://${HOST}:3000`;
+  PROTOCOL = 'https', // replace with 'http' when running a local server
+  WS_PROTOCOL = 'wss', // replace with 'ws' when running a local server
+  HOST = 'social-login-sample-server.overwolf.com', // replace with 'localhost' when running a local server
+  API_URL = `${PROTOCOL}://${HOST}`,
+  WS_URL = `${WS_PROTOCOL}://${HOST}`;
 
-// This token will be used to identify our client & get the SteamID
-let sessionId = null;
-
-let socketConnection;
+let
+  sessionId = null, // This token will be used to identify our client & get the SteamID
+  socketConnection = null; // Websocket connection handle
 
 async function startApp() {
   if (localStorage.sessionId) {
@@ -25,6 +25,15 @@ async function startApp() {
   openMainWindow();
 }
 
+// 1. First make a websocket connection to server
+// 2. The server sends a Session ID token that will identify this client when it
+//    makes HTTP requests
+// 3. The Session ID is saved in LocalStorage in an encrypted format
+// 4. Login URL is opened in the browser with the identifying Session ID token
+//    sent as argument
+// 5. When the user logs in in their browser the server sends a Websocket
+//    message with their Steam ID. Now the user is logged in, and can make
+//    authenticated requests like get-user/ (getUser() function)
 async function login() {
   if (sessionId) {
     console.log('login(): please log out before logging in again');
@@ -41,16 +50,23 @@ async function login() {
     );
   } catch(e) {
     console.warn('login(): error:', e);
+    sessionId = null;
+    localStorage.removeItem('sessionId');
   }
 }
 
+// Call the logout endpoint on the server, and remove the session token in this client
 async function logout() {
   if (!sessionId) {
     console.log('logout(): you are not logged in');
     return;
   }
 
-  await fetch(`${API_URL}/logout/?sessionId=${sessionId}`);
+  try {
+    await fetch(`${API_URL}/logout/?sessionId=${sessionId}`);
+  } catch(e) {
+    console.warn('logout(): error:', e);
+  }
 
   sessionId = null;
   localStorage.removeItem('sessionId');
@@ -58,6 +74,7 @@ async function logout() {
   console.log('logout(): logged out');
 }
 
+// Get the users steamID when they are logged in
 async function getUser() {
   if (!sessionId) {
     console.log('getUser(): no sessionId, please log in');
@@ -86,6 +103,7 @@ async function getUser() {
 function connectWebsocket() { return new Promise((resolve, reject) => {
   if (socketConnection) {
     socketConnection.close();
+    socketConnection = null;
   }
 
   socketConnection = new WebSocket(WS_URL);
@@ -106,23 +124,27 @@ function connectWebsocket() { return new Promise((resolve, reject) => {
   socketConnection.addEventListener('message', e => {
     console.log('connectWebsocket(): socket message:', e?.data);
 
-    if (e?.data) {
-      try {
-        const message = JSON.parse(e.data);
+    if (!e?.data) {
+      return;
+    }
 
-        switch (message?.messageType) {
-          case 'sessionId':
-            console.log('got sessionId from websocket:', message.sessionId);
-            resolve(message.sessionId);
-          break;
-          case 'login':
-            console.log('logged in as user', message.user);
-            socketConnection.close();
-          break;
-        }
-      } catch (err) {
-        console.warn('could not parse websocket message:', e, err);
+    try {
+      const message = JSON.parse(e.data);
+
+      switch (message?.messageType) {
+        // This promise is resolved with a session token when the server connects
+        case 'sessionId':
+          console.log('connectWebsocket(): got sessionId from websocket:', message.sessionId);
+          resolve(message.sessionId);
+        break;
+        // Logged in successfully, we got the steamID, we can close the websocket connection now
+        case 'login':
+          console.log('connectWebsocket(): logged in as user', message.user);
+          socketConnection.close();
+        break;
       }
+    } catch (err) {
+      console.warn('connectWebsocket(): could not parse websocket message:', e, err);
     }
   });
 
@@ -132,6 +154,7 @@ function connectWebsocket() { return new Promise((resolve, reject) => {
   );
 })}
 
+// Encrypt the session token for safe storage
 function encrypt(string) { return new Promise((resolve, reject) => {
   overwolf.cryptography.encryptForCurrentUser(string, results => {
     if (results && results.success && results.ciphertext) {
@@ -142,6 +165,7 @@ function encrypt(string) { return new Promise((resolve, reject) => {
   });
 })}
 
+// Decrypt the session token
 function decrypt(string) { return new Promise((resolve, reject) => {
   overwolf.cryptography.decryptForCurrentUser(string, results => {
     if (results && results.success && results.plaintext) {
@@ -167,4 +191,4 @@ function openMainWindow() {
   });
 }
 
-startApp().catch(console.log);
+startApp().catch(console.error);
