@@ -17,8 +17,8 @@ const PROTOCOL = process.env.PROTOCOL || DEFAULT_PROTOCOL;
 const DEFAULT_PORT = 3000;
 const PORT = parseInt(process.env.PORT || DEFAULT_PORT);
 
-const DEFAULT_HOST = 'localhost';
-const HOST = process.env.HOST || DEFAULT_HOST;
+const DEFAULT_RETURN_HOST = `localhost:${PORT}`;
+const RETURN_HOST = process.env.RETURN_HOST || DEFAULT_RETURN_HOST;
 
 const socketConnections = new Map();
 const usersStore = new Map();
@@ -41,8 +41,8 @@ passport.deserializeUser((userSerialized, done) => {
 // callback with a user object.
 const strategy = new SteamStrategy(
   {
-    returnURL: `${PROTOCOL}://${HOST}/auth/steam/return`,
-    realm: `${PROTOCOL}://${HOST}/`,
+    returnURL: `${PROTOCOL}://${RETURN_HOST}/auth/steam/return`,
+    realm: `${PROTOCOL}://${RETURN_HOST}/`,
     apiKey: '9F9EAB91E6DF537212EDDE1CE7C8AEF5',
     profile: false
   },
