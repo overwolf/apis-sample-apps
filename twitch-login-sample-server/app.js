@@ -4,7 +4,8 @@ import http from 'http'
 import WebSocket from 'ws'
 import passport from 'passport'
 import session from 'express-session'
-import SteamStrategy from 'passport-steam'
+import axios from 'axios'
+import { OAuth2Strategy } from 'passport-oauth';
 import { v4 as uuid, validate as validateUUID } from 'uuid'
 
 dotenv.config();
@@ -18,14 +19,42 @@ const PORT = parseInt(process.env.PORT || DEFAULT_PORT);
 const DEFAULT_RETURN_HOST = `localhost:${PORT}`;
 const RETURN_HOST = process.env.RETURN_HOST || DEFAULT_RETURN_HOST;
 
-const socketConnections = new Map();
-const usersStore = new Map();
+const {
+  TWITCH_CLIENT_ID,
+  TWITCH_CLIENT_SECRET
+} = process.env;
 
-// Passport session setup.
-// To support persistent login sessions, Passport needs to be able to
-// serialize users into and deserialize users out of the session.  Typically,
-// this will be as simple as storing the user ID when serializing, and finding
-// the user by ID when deserializing.
+const AUTH_SCOPE = ['user:read:email'];
+
+const
+  socketConnections = new Map(),
+  usersStore = new Map();
+
+async function getUserByToken(accessToken) {
+  const options = {
+    headers: {
+      'Client-ID': TWITCH_CLIENT_ID,
+      'Accept': 'application/vnd.twitchtv.v5+json',
+      'Authorization': `Bearer ${accessToken}`
+    }
+  };
+
+  const response = await axios.get('https://api.twitch.tv/helix/users', options);
+
+  if (response.status === 200 && response.data?.data && response.data.data[0]) {
+    return response.data.data[0];
+  } else {
+    return null;
+  }
+}
+
+// Override passport profile function to get user profile from Twitch API
+OAuth2Strategy.prototype.userProfile = async function(accessToken, done) {
+  const twitchUser = await getUserByToken(accessToken);
+
+  done(null, { twitchUser });
+}
+
 passport.serializeUser((user, done) => {
   done(null, user);
 });
@@ -34,31 +63,26 @@ passport.deserializeUser((userSerialized, done) => {
   done(null, userSerialized);
 });
 
-// Strategies in passport require a `validate` function, which accept
-// credentials (in this case, an OpenID identifier and profile), and invoke a
-// callback with a user object.
-const strategy = new SteamStrategy(
+passport.use('twitch', new OAuth2Strategy(
   {
-    returnURL: `${PROTOCOL}://${RETURN_HOST}/auth/steam/return`,
-    realm: `${PROTOCOL}://${RETURN_HOST}/`,
-    apiKey: '9F9EAB91E6DF537212EDDE1CE7C8AEF5',
-    profile: false
+    authorizationURL: 'https://id.twitch.tv/oauth2/authorize',
+    tokenURL: 'https://id.twitch.tv/oauth2/token',
+    clientID: TWITCH_CLIENT_ID,
+    clientSecret: TWITCH_CLIENT_SECRET,
+    callbackURL: `${PROTOCOL}://${RETURN_HOST}/auth/twitch/return`,
+    state: true
   },
-  (identifier, profile, done) => {
-    process.nextTick(() => {
-      const
-        steamIdRegex = /^https?:\/\/steamcommunity\.com\/openid\/id\/(\d+)$/,
-        steamId = steamIdRegex.exec(identifier)[1];
-
-      done(null, { ...profile, steamId });
+  (accessToken, refreshToken, profile, done) => {
+    done(null, {
+      ...profile,
+      twitchAccessToken: accessToken,
+      twitchRefreshToken: refreshToken
     });
   }
-);
-
-passport.use(strategy);
+));
 
 const sessionParser = session({
-  secret: 'lorem ipsum',
+  secret: 'twitch ow login',
   name: 'sid',
   resave: false,
   saveUninitialized: false
@@ -83,17 +107,65 @@ app.get('/', (req, res) => res.send(''));
 
 app.get(
   '/get-user',
-  (req, res) => {
+  async (req, res) => {
     const sessionId = req.query?.sessionId;
 
-    if (sessionId) {
-      if (usersStore.has(req.query.sessionId)) {
-        res.json({ steamID: usersStore.get(req.query.sessionId) });
-      } else {
-        res.sendStatus(404);
-      }
-    } else {
+    if (!sessionId) {
       res.sendStatus(401);
+      return;
+    }
+
+    if (!usersStore.has(sessionId)) {
+      res.sendStatus(404);
+      return;
+    }
+
+    const user = usersStore.get(sessionId);
+
+    const userInfo = await getUserByToken(user.twitchAccessToken)
+
+    if (userInfo) {
+      res.json(userInfo);
+    } else {
+      res.sendStatus(404);
+    }
+  }
+);
+
+app.get(
+  '/get-channel',
+  async (req, res) => {
+    const sessionId = req.query?.sessionId;
+
+    if (!sessionId) {
+      res.sendStatus(401);
+      return;
+    }
+
+    if (!usersStore.has(sessionId)) {
+      res.sendStatus(404);
+      return;
+    }
+
+    const user = usersStore.get(sessionId);
+
+    const options = {
+      headers: {
+        'Client-ID': TWITCH_CLIENT_ID,
+        'Accept': 'application/vnd.twitchtv.v5+json',
+        'Authorization': `Bearer ${user.twitchAccessToken}`
+      }
+    };
+
+    const response = await axios.get(
+      `https://api.twitch.tv/helix/channels?broadcaster_id=${user.twitchUser.id}`,
+      options
+    );
+
+    if (response.status === 200 && response.data?.data && response.data.data[0]) {
+      res.json(response.data.data[0]);
+    } else {
+      res.sendStatus(404);
     }
   }
 );
@@ -113,11 +185,11 @@ app.get('/logout', (req, res) => {
 
 // GET /auth/steam
 // Use passport.authenticate() as route middleware to authenticate the
-// request.  The first step in Steam authentication will involve redirecting
-// the user to steamcommunity.com.  After authenticating, Steam will redirect the
+// request. The first step in Twitch authentication will involve redirecting
+// the user to steamcommunity.com.  After authenticating, Twitch will redirect the
 // user back to this application at /auth/steam/return
 app.get(
-  '/auth/steam',
+  '/auth/twitch',
   (req, res, next) => {
     if (
       req.query?.sessionId &&
@@ -130,7 +202,10 @@ app.get(
       res.sendStatus(401);
     }
   },
-  passport.authenticate('steam', { failureRedirect: '/' }),
+  passport.authenticate('twitch', {
+    scope: AUTH_SCOPE,
+    failureRedirect: '/'
+  }),
   (req, res) => res.redirect('/')
 );
 
@@ -140,7 +215,7 @@ app.get(
 // login page.  Otherwise, the primary route function function will be called,
 // which, in this example, will redirect the user to the home page.
 app.get(
-  '/auth/steam/return',
+  '/auth/twitch/return',
   (req, res, next) => {
     if (
       req.session?.sessionId &&
@@ -152,7 +227,7 @@ app.get(
       res.sendStatus(401);
     }
   },
-  passport.authenticate('steam', { failureRedirect: '/' }),
+  passport.authenticate('twitch', { failureRedirect: '/' }),
   (req, res) => {
     if (!req.isAuthenticated()) {
       res.sendStatus(401);
@@ -166,11 +241,11 @@ app.get(
       return;
     }
 
-    usersStore.set(req.session.sessionId, req.user.steamId);
+    usersStore.set(req.session.sessionId, req.user);
 
     ws.send(JSON.stringify({
       messageType: 'login',
-      user: req.user.steamId
+      user: req.user.twitchUser
     }));
 
     res.redirect('/auth/success');
@@ -182,14 +257,14 @@ app.get(
 app.get(
   '/auth/success',
   (req, res) => {
-    res.send(`logged in successfully, see message in Overwolf app's console`);
+    res.send(`Logged in successfully, see message in Overwolf app's console`);
   }
 );
 
 wss.on('connection', (ws, req) => {
   const sessionId = uuid();
 
-  console.log(`websocket client ${sessionId} connected`);
+  console.log(`Websocket client ${sessionId} connected`);
 
   ws.send(JSON.stringify({
     messageType: 'sessionId',
@@ -208,10 +283,6 @@ wss.on('connection', (ws, req) => {
   });
 });
 
-function startServer() {
-  server.listen(PORT, () => {
-    console.log(`Server listening on port ${server.address().port}`);
-  });
-}
-
-startServer();
+server.listen(PORT, () => {
+  console.log(`Server listening on port ${server.address().port}`);
+});
