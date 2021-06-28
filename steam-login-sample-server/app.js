@@ -7,6 +7,7 @@ import session from 'express-session'
 import SteamStrategy from 'passport-steam'
 import { v4 as uuid, validate as validateUUID } from 'uuid'
 
+// Gets environment variables from .env file if it exists
 dotenv.config();
 
 const DEFAULT_PROTOCOL = 'http';
@@ -21,11 +22,6 @@ const RETURN_HOST = process.env.RETURN_HOST || DEFAULT_RETURN_HOST;
 const socketConnections = new Map();
 const usersStore = new Map();
 
-// Passport session setup.
-// To support persistent login sessions, Passport needs to be able to
-// serialize users into and deserialize users out of the session.  Typically,
-// this will be as simple as storing the user ID when serializing, and finding
-// the user by ID when deserializing.
 passport.serializeUser((user, done) => {
   done(null, user);
 });

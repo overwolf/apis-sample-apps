@@ -8,6 +8,7 @@ import axios from 'axios'
 import { OAuth2Strategy } from 'passport-oauth';
 import { v4 as uuid, validate as validateUUID } from 'uuid'
 
+// Gets environment variables from .env file if it exists
 dotenv.config();
 
 const DEFAULT_PROTOCOL = 'http';
@@ -19,6 +20,9 @@ const PORT = parseInt(process.env.PORT || DEFAULT_PORT);
 const DEFAULT_RETURN_HOST = `localhost:${PORT}`;
 const RETURN_HOST = process.env.RETURN_HOST || DEFAULT_RETURN_HOST;
 
+// Get your Twitch app's client ID & secret from environment variables,
+// these can also be set in an .env file
+// You can obtain your client ID & secret at https://dev.twitch.tv/console/apps
 const {
   TWITCH_CLIENT_ID,
   TWITCH_CLIENT_SECRET
@@ -30,6 +34,23 @@ const
   socketConnections = new Map(),
   usersStore = new Map();
 
+const twitchStrategy = new OAuth2Strategy(
+  {
+    authorizationURL: 'https://id.twitch.tv/oauth2/authorize',
+    tokenURL: 'https://id.twitch.tv/oauth2/token',
+    clientID: TWITCH_CLIENT_ID,
+    clientSecret: TWITCH_CLIENT_SECRET,
+    callbackURL: `${PROTOCOL}://${RETURN_HOST}/auth/twitch/return`,
+    state: true
+  },
+  (accessToken, refreshToken, profile, done) => {
+    done(null, {
+      ...profile,
+      twitchAccessToken: accessToken,
+      twitchRefreshToken: refreshToken
+    });
+  }
+)
 async function getUserByToken(accessToken) {
   const options = {
     headers: {
@@ -63,23 +84,7 @@ passport.deserializeUser((userSerialized, done) => {
   done(null, userSerialized);
 });
 
-passport.use('twitch', new OAuth2Strategy(
-  {
-    authorizationURL: 'https://id.twitch.tv/oauth2/authorize',
-    tokenURL: 'https://id.twitch.tv/oauth2/token',
-    clientID: TWITCH_CLIENT_ID,
-    clientSecret: TWITCH_CLIENT_SECRET,
-    callbackURL: `${PROTOCOL}://${RETURN_HOST}/auth/twitch/return`,
-    state: true
-  },
-  (accessToken, refreshToken, profile, done) => {
-    done(null, {
-      ...profile,
-      twitchAccessToken: accessToken,
-      twitchRefreshToken: refreshToken
-    });
-  }
-));
+passport.use('twitch', twitchStrategy);
 
 const sessionParser = session({
   secret: 'twitch ow login',
@@ -105,6 +110,7 @@ app.set('json spaces', 2);
 
 app.get('/', (req, res) => res.send(''));
 
+// Gets Twitch User
 app.get(
   '/get-user',
   async (req, res) => {
@@ -132,6 +138,7 @@ app.get(
   }
 );
 
+// Gets Twitch Channel
 app.get(
   '/get-channel',
   async (req, res) => {
@@ -170,6 +177,7 @@ app.get(
   }
 );
 
+// Log out
 app.get('/logout', (req, res) => {
   req.logout();
 
@@ -183,7 +191,6 @@ app.get('/logout', (req, res) => {
   res.redirect('/');
 });
 
-// GET /auth/steam
 // Use passport.authenticate() as route middleware to authenticate the
 // request. The first step in Twitch authentication will involve redirecting
 // the user to steamcommunity.com.  After authenticating, Twitch will redirect the
