@@ -14,7 +14,7 @@ dotenv.config();
 const DEFAULT_PROTOCOL = 'http';
 const PROTOCOL = process.env.PROTOCOL || DEFAULT_PROTOCOL;
 
-const DEFAULT_PORT = 3000;
+const DEFAULT_PORT = 3001;
 const PORT = parseInt(process.env.PORT || DEFAULT_PORT);
 
 const DEFAULT_RETURN_HOST = `localhost:${PORT}`;
