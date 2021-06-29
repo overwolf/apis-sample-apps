@@ -50,7 +50,8 @@ const twitchStrategy = new OAuth2Strategy(
       twitchRefreshToken: refreshToken
     });
   }
-)
+);
+
 async function getUserByToken(accessToken) {
   const options = {
     headers: {
