@@ -16,7 +16,8 @@ const
   RETURN_HOST = process.env.RETURN_HOST || `localhost:${PORT}`,
   SUBDIR = process.env.SUBDIR || '/steam';
 
-// Get your Steam API from environment variables, these can also be set in .env file
+// Get the Steam API key from environment variables,
+// these can also be set in .env file
 // You can get your own Steam API key at https://steamcommunity.com/dev/apikey
 const STEAM_API_KEY = process.env.STEAM_API_KEY;
 
