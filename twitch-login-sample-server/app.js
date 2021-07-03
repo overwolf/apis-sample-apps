@@ -11,17 +11,14 @@ import { v4 as uuid, validate as validateUUID } from 'uuid'
 // Gets environment variables from .env file if it exists
 dotenv.config();
 
-const DEFAULT_PROTOCOL = 'http';
-const PROTOCOL = process.env.PROTOCOL || DEFAULT_PROTOCOL;
+const
+  PROTOCOL = process.env.PROTOCOL || 'http',
+  PORT = parseInt(process.env.PORT || 3001),
+  RETURN_HOST = process.env.RETURN_HOST || `localhost:${PORT}`,
+  SUBDIR = process.env.SUBDIR || '/twitch';
 
-const DEFAULT_PORT = 3001;
-const PORT = parseInt(process.env.PORT || DEFAULT_PORT);
-
-const DEFAULT_RETURN_HOST = `localhost:${PORT}`;
-const RETURN_HOST = process.env.RETURN_HOST || DEFAULT_RETURN_HOST;
-
-// Get your Twitch app's client ID & secret from environment variables,
-// these can also be set in an .env file
+// Get your Twitch app's client ID & secret from environment variables, these
+// can also be set in an .env file
 // You can obtain your client ID & secret at https://dev.twitch.tv/console/apps
 const {
   TWITCH_CLIENT_ID,
@@ -40,7 +37,7 @@ const twitchStrategy = new OAuth2Strategy(
     tokenURL: 'https://id.twitch.tv/oauth2/token',
     clientID: TWITCH_CLIENT_ID,
     clientSecret: TWITCH_CLIENT_SECRET,
-    callbackURL: `${PROTOCOL}://${RETURN_HOST}/auth/twitch/return`,
+    callbackURL: `${PROTOCOL}://${RETURN_HOST}${SUBDIR}/auth/return`,
     state: true
   },
   (accessToken, refreshToken, profile, done) => {
@@ -109,11 +106,9 @@ app.use(passport.session());
 // Format JSON output in a nice way
 app.set('json spaces', 2);
 
-app.get('/', (req, res) => res.send(''));
-
 // Gets Twitch User
 app.get(
-  '/get-user',
+  `${SUBDIR}/get-user`,
   async (req, res) => {
     const sessionId = req.query?.sessionId;
 
@@ -141,7 +136,7 @@ app.get(
 
 // Gets Twitch Channel
 app.get(
-  '/get-channel',
+  `${SUBDIR}/get-channel`,
   async (req, res) => {
     const sessionId = req.query?.sessionId;
 
@@ -179,7 +174,7 @@ app.get(
 );
 
 // Log out
-app.get('/logout', (req, res) => {
+app.get(`${SUBDIR}/logout`, (req, res) => {
   req.logout();
 
   const sessionId = req.query?.sessionId;
@@ -197,7 +192,7 @@ app.get('/logout', (req, res) => {
 // the user to twitch.com.  After authenticating, Twitch will redirect the
 // user back to this application at /auth/steam/return
 app.get(
-  '/auth/twitch',
+  `${SUBDIR}/auth/twitch`,
   (req, res, next) => {
     if (
       req.query?.sessionId &&
@@ -217,13 +212,12 @@ app.get(
   (req, res) => res.redirect('/')
 );
 
-// GET /auth/steam/return
 // Use passport.authenticate() as route middleware to authenticate the
 // request. If authentication fails, the user will be redirected back to the
 // login page.  Otherwise, the primary route function function will be called,
 // which, in this example, will redirect the user to the home page.
 app.get(
-  '/auth/twitch/return',
+  `${SUBDIR}/auth/return`,
   (req, res, next) => {
     if (
       req.session?.sessionId &&
@@ -256,14 +250,14 @@ app.get(
       user: req.user.twitchUser
     }));
 
-    res.redirect('/auth/success');
+    res.redirect(`${SUBDIR}/auth/success`);
 
     ws.close();
   }
 );
 
 app.get(
-  '/auth/success',
+  `${SUBDIR}/auth/success`,
   (req, res) => {
     res.send(`Logged in successfully, see message in Overwolf app's console`);
   }

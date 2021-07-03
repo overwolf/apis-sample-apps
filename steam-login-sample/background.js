@@ -2,8 +2,8 @@ const
   PROTOCOL = 'https', // replace with 'http' when running a local server
   WS_PROTOCOL = 'wss', // replace with 'ws' when running a local server
   HOST = 'social-login-sample-server.overwolf.com', // replace with 'localhost' when running a local server
-  API_URL = `${PROTOCOL}://${HOST}`,
-  WS_URL = `${WS_PROTOCOL}://${HOST}`;
+  API_URL = `${PROTOCOL}://${HOST}/steam`,
+  WS_URL = `${WS_PROTOCOL}://${HOST}/steam`;
 
 let
   sessionId = null, // This token will be used to identify our client & get the SteamID
@@ -45,7 +45,7 @@ async function login() {
     localStorage.sessionId = await encrypt(sessionId);
 
     overwolf.utils.openUrlInDefaultBrowser(
-      `${API_URL}/auth/steam/?sessionId=${sessionId}`,
+      `${API_URL}/auth/?sessionId=${sessionId}`,
       { skip_in_game_notification: true }
     );
   } catch(e) {

@@ -4,8 +4,8 @@ const
   PROTOCOL = 'http', // replace with 'http' when running a local server
   WS_PROTOCOL = 'ws', // replace with 'ws' when running a local server
   HOST = 'localhost:3001', // replace with 'localhost' when running a local server
-  API_URL = `${PROTOCOL}://${HOST}`,
-  WS_URL = `${WS_PROTOCOL}://${HOST}`;
+  API_URL = `${PROTOCOL}://${HOST}/twitch`,
+  WS_URL = `${WS_PROTOCOL}://${HOST}/twitch`;
 
 let
   sessionId = null,
@@ -48,7 +48,7 @@ async function login() {
     localStorage.sessionId = await encrypt(sessionId);
 
     overwolf.utils.openUrlInDefaultBrowser(
-      `${API_URL}/auth/twitch/?sessionId=${sessionId}`,
+      `${API_URL}/auth/?sessionId=${sessionId}`,
       { skip_in_game_notification: true }
     );
   } catch(e) {

@@ -10,17 +10,19 @@ import { v4 as uuid, validate as validateUUID } from 'uuid'
 // Gets environment variables from .env file if it exists
 dotenv.config();
 
-const DEFAULT_PROTOCOL = 'http';
-const PROTOCOL = process.env.PROTOCOL || DEFAULT_PROTOCOL;
+const
+  PROTOCOL = process.env.PROTOCOL || 'http',
+  PORT = parseInt(process.env.PORT || 3000),
+  RETURN_HOST = process.env.RETURN_HOST || `localhost:${PORT}`,
+  SUBDIR = process.env.SUBDIR || '/steam';
 
-const DEFAULT_PORT = 3000;
-const PORT = parseInt(process.env.PORT || DEFAULT_PORT);
+// Get your Steam API from environment variables, these can also be set in .env file
+// You can get your own Steam API key at https://steamcommunity.com/dev/apikey
+const STEAM_API_KEY = process.env.STEAM_API_KEY;
 
-const DEFAULT_RETURN_HOST = `localhost:${PORT}`;
-const RETURN_HOST = process.env.RETURN_HOST || DEFAULT_RETURN_HOST;
-
-const socketConnections = new Map();
-const usersStore = new Map();
+const
+  socketConnections = new Map(),
+  usersStore = new Map();
 
 passport.serializeUser((user, done) => {
   done(null, user);
@@ -35,9 +37,9 @@ passport.deserializeUser((userSerialized, done) => {
 // callback with a user object.
 const strategy = new SteamStrategy(
   {
-    returnURL: `${PROTOCOL}://${RETURN_HOST}/auth/steam/return`,
+    returnURL: `${PROTOCOL}://${RETURN_HOST}${SUBDIR}/auth/return`,
     realm: `${PROTOCOL}://${RETURN_HOST}/`,
-    apiKey: '9F9EAB91E6DF537212EDDE1CE7C8AEF5',
+    apiKey: STEAM_API_KEY,
     profile: false
   },
   (identifier, profile, done) => {
@@ -75,10 +77,8 @@ app.use(passport.session());
 // Format JSON output in a nice way
 app.set('json spaces', 2);
 
-app.get('/', (req, res) => res.send(''));
-
 app.get(
-  '/get-user',
+  `${SUBDIR}/get-user`,
   (req, res) => {
     const sessionId = req.query?.sessionId;
 
@@ -94,7 +94,7 @@ app.get(
   }
 );
 
-app.get('/logout', (req, res) => {
+app.get(`${SUBDIR}/logout`, (req, res) => {
   req.logout();
 
   const sessionId = req.query?.sessionId;
@@ -107,13 +107,12 @@ app.get('/logout', (req, res) => {
   res.redirect('/');
 });
 
-// GET /auth/steam
 // Use passport.authenticate() as route middleware to authenticate the
 // request.  The first step in Steam authentication will involve redirecting
 // the user to steamcommunity.com.  After authenticating, Steam will redirect the
 // user back to this application at /auth/steam/return
 app.get(
-  '/auth/steam',
+  `${SUBDIR}/auth/`,
   (req, res, next) => {
     if (
       req.query?.sessionId &&
@@ -130,13 +129,12 @@ app.get(
   (req, res) => res.redirect('/')
 );
 
-// GET /auth/steam/return
 // Use passport.authenticate() as route middleware to authenticate the
 // request.  If authentication fails, the user will be redirected back to the
 // login page.  Otherwise, the primary route function function will be called,
 // which, in this example, will redirect the user to the home page.
 app.get(
-  '/auth/steam/return',
+  `${SUBDIR}/auth/return`,
   (req, res, next) => {
     if (
       req.session?.sessionId &&
@@ -169,14 +167,14 @@ app.get(
       user: req.user.steamId
     }));
 
-    res.redirect('/auth/success');
+    res.redirect(`${SUBDIR}/auth/success`);
 
     ws.close();
   }
 );
 
 app.get(
-  '/auth/success',
+  `${SUBDIR}/auth/success`,
   (req, res) => {
     res.send(`logged in successfully, see message in Overwolf app's console`);
   }
