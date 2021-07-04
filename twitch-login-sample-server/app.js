@@ -192,7 +192,7 @@ app.get(`${SUBDIR}/logout`, (req, res) => {
 // the user to twitch.com.  After authenticating, Twitch will redirect the
 // user back to this application at /auth/steam/return
 app.get(
-  `${SUBDIR}/auth/twitch`,
+  `${SUBDIR}/auth`,
   (req, res, next) => {
     if (
       req.query?.sessionId &&

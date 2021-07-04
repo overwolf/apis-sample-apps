@@ -113,7 +113,7 @@ app.get(`${SUBDIR}/logout`, (req, res) => {
 // the user to steamcommunity.com.  After authenticating, Steam will redirect the
 // user back to this application at /auth/steam/return
 app.get(
-  `${SUBDIR}/auth/`,
+  `${SUBDIR}/auth`,
   (req, res, next) => {
     if (
       req.query?.sessionId &&

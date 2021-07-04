@@ -1,9 +1,9 @@
 // import TwitchAPI from 'https://cdn.jsdelivr.net/npm/twitch@4.6.0/es/index.mjs'
 
 const
-  PROTOCOL = 'http', // replace with 'http' when running a local server
-  WS_PROTOCOL = 'ws', // replace with 'ws' when running a local server
-  HOST = 'localhost:3001', // replace with 'localhost' when running a local server
+  PROTOCOL = 'https', // replace with 'http' when running a local server
+  WS_PROTOCOL = 'wss', // replace with 'ws' when running a local server
+  HOST = 'social-login-sample-server.overwolf.com', // replace with 'localhost' when running a local server
   API_URL = `${PROTOCOL}://${HOST}/twitch`,
   WS_URL = `${WS_PROTOCOL}://${HOST}/twitch`;
 
