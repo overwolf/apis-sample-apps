@@ -1,7 +1,7 @@
 const
   PROTOCOL = 'https', // replace with 'http' when running a local server
   WS_PROTOCOL = 'wss', // replace with 'ws' when running a local server
-  HOST = 'social-login-sample-server.overwolf.com', // replace with 'localhost' when running a local server
+  HOST = 'social-login-sample-server.overwolf.com', // replace with 'localhost:3000' when running a local server
   API_URL = `${PROTOCOL}://${HOST}/steam`,
   WS_URL = `${WS_PROTOCOL}://${HOST}/steam`;
 
