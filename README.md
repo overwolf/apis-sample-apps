@@ -1,5 +1,10 @@
 Sample apps to make the OW creators' lives easier: each app demonstrates the primary usage in a particular API.
 
+## Usage
+
+* Download the repo to your machine.
+* Load each folder to the OW client as unpacked extension.
+
 ## app-channels-sample
 
 Demonstrates how to use the app channels feature and API.  
