@@ -47,6 +47,15 @@ More info here: https://overwolf.github.io/docs/topics/login-with-twitch.
 
 The server side part of the sample app.
 
+### google-login-sample 
+
+Example on how to implement a 3rd party login interface with Google, in your Overwolf app.
+More info here: https://overwolf.github.io/docs/topics/login-with-twitch.
+
+#### google-login-sample-server
+
+The server side part of the sample app.
+
 
 
 
