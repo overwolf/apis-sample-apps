@@ -29,7 +29,7 @@ More info here: https://overwolf.github.io/docs/api/overwolf-media-replays
 
 Set of apps that demonstrates how to integrate different kind of "Login with.." buttons in your OW apps.
 
-### steam-login-sample
+### 1. steam-login-sample
 
 Example on how to implement a 3rd party login interface with Steam, in your Overwolf app.
 More info here: https://overwolf.github.io/docs/topics/login-with-twitch.
@@ -38,7 +38,7 @@ More info here: https://overwolf.github.io/docs/topics/login-with-twitch.
 
 The server side part of the sample app.
 
-### twitch-login-sample 
+### 2. twitch-login-sample 
 
 Example on how to implement a 3rd party login interface with Twitch, in your Overwolf app.
 More info here: https://overwolf.github.io/docs/topics/login-with-twitch.
@@ -47,7 +47,7 @@ More info here: https://overwolf.github.io/docs/topics/login-with-twitch.
 
 The server side part of the sample app.
 
-### google-login-sample 
+### 3. google-login-sample 
 
 Example on how to implement a 3rd party login interface with Google, in your Overwolf app.
 More info here: https://overwolf.github.io/docs/topics/login-with-twitch.
