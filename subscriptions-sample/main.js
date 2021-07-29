@@ -10,6 +10,8 @@ async function init() {
   backgroundController.setOnSubscriptionChanged(active => {
     if (subscriptionIsActive !== active) {
       subscriptionIsActive = active;
+
+      updateSubscriptionStatus();
       updateAd();
     }
   });
@@ -17,6 +19,7 @@ async function init() {
   subscriptionIsActive = backgroundController.isSubscriptionActive();
   windowIsOpen = await getWindowIsOpen();
 
+  updateSubscriptionStatus();
   updateAd();
 
   overwolf.windows.onStateChanged.removeListener(onWindowStateChanged);
@@ -69,7 +72,23 @@ function onWindowStateChanged(state) {
   }
 }
 
+function updateSubscriptionStatus() {
+  const el = document.getElementById('subscriptionStatus');
+
+  if (subscriptionIsActive) {
+    el.innerHTML = 'You are <b>subscribed</b>, ad will not be shown.';
+  } else {
+    el.innerHTML = 'You are <b>not subscribed</b>, ad will be shown.';
+  }
+}
+
 function updateAd() {
+  if (subscriptionIsActive) {
+    console.log('Subscription is active, ad will be removed');
+  } else {
+    console.log('Subscription is not active, ad will be shown');
+  }
+
   if (windowIsOpen && !subscriptionIsActive) {
     createAd();
   } else {

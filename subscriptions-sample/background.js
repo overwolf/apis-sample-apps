@@ -1,4 +1,4 @@
-const SUBSCRIPTION_PLAN_ID = 90;
+const SUBSCRIPTION_PLAN_ID = 96;
 
 let subscriptionActive = false;
 
