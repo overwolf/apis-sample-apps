@@ -5,6 +5,9 @@ let subscriptionIsActive = false;
 let adInstance = null;
 
 async function init() {
+  // Force the ads script to display a test ad, this is not intended for production
+  localStorage.owAdsForceAdUnit = "Ad_test";
+
   const backgroundController = overwolf.windows.getMainWindow();
 
   backgroundController.setOnSubscriptionChanged(active => {
