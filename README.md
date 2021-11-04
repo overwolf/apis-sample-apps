@@ -5,6 +5,17 @@ Sample apps to make the OW creators' lives easier: each app demonstrates the pri
 * Download the repo to your machine.
 * Load each folder to the OW client as unpacked extension.
 
+## io-samlpe
+
+## ads-sample
+
+This is an elementary sample app for ads.
+The app contains one desktop window with an ad. When this window is hidden or minimized, the ad is removed.
+
+## subscription-sample
+
+Demonstrates how to use thesubscriptions API.  
+
 ## app-channels-sample
 
 Demonstrates how to use the app channels feature and API.  
