@@ -36,7 +36,7 @@ async function getWindowIsVisible() {
     overwolf.windows.isWindowVisibleToUser(resolve);
   });
 
-  const isVisible = (state && state.success && state.visible === 'full');
+  const isVisible = (state && state.success && state.visible !== 'hidden');
 
   console.log(`getWindowIsVisible():`, isVisible, state);
 
