@@ -38,7 +38,7 @@ async function getWindowIsVisible() {
 
   const isVisible = (state && state.success && state.visible !== 'hidden');
 
-  console.log(`getWindowIsVisible():`, isVisible, state);
+  console.log(`getWindowIsVisible():`, state.visible, isVisible);
 
   return isVisible;
 }
@@ -63,7 +63,7 @@ async function getWindowIsOpen() {
       state.window_state_ex === 'maximized'
     );
 
-    console.log(`getWindowIsOpen():`, isOpen, state);
+    console.log(`getWindowIsOpen():`, isOpen, state.window_state_ex);
 
     return isOpen;
   }
@@ -78,7 +78,7 @@ function onWindowStateChanged(state) {
       state.window_state_ex === 'maximized'
     );
 
-    console.log(`onWindowStateChanged:`, isOpen, state);
+    console.log(`onWindowStateChanged:`, isOpen, state.window_state_ex);
 
     if (windowIsOpen !== isOpen) {
       windowIsOpen = isOpen;
