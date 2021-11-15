@@ -1,20 +1,25 @@
 const WINDOW_NAME = 'main';
 
-let windowIsOpen = false;
-let adInstance = null;
+let
+  updateWindowIsVisibleInterval = null,
+  windowIsOpen = false,
+  windowIsVisible = false,
+  adInstance = null;
 
 async function init() {
   // Force the ads script to display a test ad, this is not intended for production
   localStorage.owAdsForceAdUnit = "Ad_test";
 
-  windowIsOpen = await getWindowIsOpen();
+  registerListeners();
 
-  updateAd();
+  windowIsOpen = await getWindowIsOpen();
 
   overwolf.windows.onStateChanged.removeListener(onWindowStateChanged);
   overwolf.windows.onStateChanged.addListener(onWindowStateChanged);
 
-  registerListeners();
+  windowIsVisible = await getWindowIsVisible();
+
+  updateWindowIsVisibleInterval = setInterval(updateWindowIsVisible, 2000);
 }
 
 function loadAdLib() { return new Promise((resolve, reject) => {
@@ -26,15 +31,39 @@ function loadAdLib() { return new Promise((resolve, reject) => {
   document.body.appendChild(el);
 })}
 
-async function getWindowIsOpen() {
+async function getWindowIsVisible() {
   const state = await new Promise(resolve => {
-    overwolf.windows.getWindowState(WINDOW_NAME, resolve)
+    overwolf.windows.isWindowVisibleToUser(resolve);
   });
 
-  if (state && state.success && state.window_state && state.status === 'success') {
-    const isOpen = (state.window_state === 'normal' || state.window_state === 'maximized');
+  const isVisible = (state && state.success && state.visible === 'full');
 
-    console.log(`getWindowIsOpen(): ${WINDOW_NAME} window is open:`, isOpen);
+  console.log(`getWindowIsVisible():`, isVisible, state);
+
+  return isVisible;
+}
+
+async function updateWindowIsVisible() {
+  const isVisible = await getWindowIsVisible();
+
+  if (windowIsVisible !== isVisible) {
+    windowIsVisible = isVisible;
+    updateAd();
+  }
+}
+
+async function getWindowIsOpen() {
+  const state = await new Promise(resolve => {
+    overwolf.windows.getWindowState(WINDOW_NAME, resolve);
+  });
+
+  if (state && state.success && state.window_state_ex) {
+    const isOpen = (
+      state.window_state_ex === 'normal' ||
+      state.window_state_ex === 'maximized'
+    );
+
+    console.log(`getWindowIsOpen():`, isOpen, state);
 
     return isOpen;
   }
@@ -43,10 +72,13 @@ async function getWindowIsOpen() {
 }
 
 function onWindowStateChanged(state) {
-  if (state && state.window_state && state.window_name === WINDOW_NAME) {
-    const isOpen = (state.window_state === 'normal' || state.window_state === 'maximized');
+  if (state && state.window_state_ex && state.window_name === WINDOW_NAME) {
+    const isOpen = (
+      state.window_state_ex === 'normal' ||
+      state.window_state_ex === 'maximized'
+    );
 
-    console.log(`onWindowStateChanged: ${WINDOW_NAME} window is open:`, isOpen);
+    console.log(`onWindowStateChanged:`, isOpen, state);
 
     if (windowIsOpen !== isOpen) {
       windowIsOpen = isOpen;
@@ -56,10 +88,10 @@ function onWindowStateChanged(state) {
 }
 
 function updateAd() {
-  if (windowIsOpen) {
+  if (windowIsOpen && windowIsVisible) {
     createAd();
   } else {
-    destroyAd();
+    removeAd();
   }
 }
 
@@ -73,12 +105,13 @@ async function createAd() {
     }
   }
 
-  const adCont = document.getElementById('adContainer');
-
   if (adInstance !== null) {
     adInstance.refreshAd();
+    console.log('createAd(): refreshAd');
     return;
   }
+
+  const adCont = document.getElementById('adContainer');
 
   adInstance = new window.OwAd(adCont, {
     size: {
@@ -99,14 +132,28 @@ async function createAd() {
     console.error(e);
   });
 
-  console.log('createAd()');
+  console.log('createAd(): new Ad instance');
 }
 
-function destroyAd() {
+function removeAd() {
   if (adInstance !== null) {
-    console.log('destroyAd()');
+    console.log('removeAd()');
     adInstance.removeAd();
   }
+}
+
+function setTab(tab) {
+  document.querySelectorAll(`.tabsSelector li`).forEach(el => {
+    if (el.dataset.tab === tab) {
+      el.classList.add('active');
+    } else {
+      el.classList.remove('active');
+    }
+  });
+
+  document.querySelectorAll(`.tabContent`).forEach(el => {
+    el.hidden = Boolean(el.id !== tab);
+  });
 }
 
 function registerListeners() {
@@ -115,6 +162,12 @@ function registerListeners() {
 
     backgroundController.openMainConsole();
   });
+
+  document.querySelectorAll('.tabsSelector li').forEach(el => {
+    el.addEventListener('click', () => {
+      setTab(el.dataset.tab);
+    });
+  })
 }
 
 init();

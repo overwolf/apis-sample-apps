@@ -91,7 +91,6 @@ body {
 body {
   position: relative;
   height: 100vh;
-  padding: 15px;
   line-height: 20px;
   color: #d5d5d5;
   background-color: #333;
@@ -101,6 +100,41 @@ body {
 
 /* Styles */
 
+p {
+  margin-bottom: 15px;
+}
+b {
+  font-weight: 600;
+}
+.tabsSelector {
+  display: flex;
+  align-items: flex-start;
+  padding: 0 15px;
+  font-family: "Roboto", sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  background: linear-gradient(to top, #464646 3px, rgba(0, 0, 0, 0.33) 3px);
+}
+.tabsSelector li {
+  display: block;
+  padding: 8px 10px 5px;
+  border-bottom: 3px solid #464646;
+  cursor: pointer;
+  transition:
+    background-color .15s ease-in-out,
+    border-bottom-color .15s ease-in-out;
+}
+.tabsSelector li:hover {
+  border-bottom-color: #5c5c5c;
+}
+.tabsSelector li.active {
+  background-color: #333;
+  border-bottom-color: #8d8d8d;
+}
+.tabContent {
+  margin: 20px 15px 0;
+}
 .actions {
   display: flex;
   justify-content: flex-start;
@@ -110,17 +144,13 @@ body {
   left: 15px;
 }
 #adContainer {
-  position: relative;
+  position: absolute;
+  bottom: 56px;
+  right: 15px;
   width: 400px;
   height: 300px;
   background: #252525 url('icons/IconMouseNormal.png') center center no-repeat;
   background-size: 120px;
-}
-p {
-  margin-bottom: 15px;
-}
-b {
-  font-weight: 600;
 }
 button {
   display: block;
@@ -130,7 +160,7 @@ button {
   color: #d5d5d5;
   background: #3b3b3b;
   border-radius: 2px;
-  font-family: "Roboto";
+  font-family: "Roboto", sans-serif;
   font-weight: 700;
   font-size: 12px;
   text-transform: uppercase;
@@ -139,8 +169,8 @@ button {
   transition: background .15s ease-in-out;
 }
 button:hover {
-  background: #8d8d8d;
   color: #ffffff;
+  background: #8d8d8d;
 }
 button:active {
   color: #d5d5d5;

@@ -12,18 +12,12 @@
     "window_icon": "icons/IconMouseOver.png",
     "description": ""
   },
-  "permissions": [
-    "Extensions",
-    "FileSystem",
-    "Streaming",
-    "Profile",
-    "GameInfo",
-    "Subscription"
-  ],
   "data": {
     "start_window": "background",
     "data": {
-      "protocol_override_domains": {"googlesyndication" : "http"}
+      "protocol_override_domains": {
+        "googlesyndication": "http"
+      }
     },
     "windows": {
       "background": {
@@ -36,6 +30,8 @@
         "transparent": false,
         "resizable": true,
         "show_in_taskbar": true,
+        "restrict_to_game_bounds": true,
+        "show_maximize": true,
         "keep_window_location": true,
         "override_on_update": true,
         "block_top_window_navigation": true,
@@ -43,11 +39,11 @@
         "mute": true,
         "size": {
           "width": 452,
-          "height": 460
+          "height": 600
         },
         "min_size": {
           "width": 452,
-          "height": 460
+          "height": 600
         },
         "start_position": {
           "top": 300,
