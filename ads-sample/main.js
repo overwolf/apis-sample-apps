@@ -63,7 +63,7 @@ async function getWindowIsOpen() {
       state.window_state_ex === 'maximized'
     );
 
-    console.log(`getWindowIsOpen():`, isOpen, state.window_state_ex);
+    console.log(`getWindowIsOpen():`, state.window_state_ex, isOpen);
 
     return isOpen;
   }
@@ -78,7 +78,7 @@ function onWindowStateChanged(state) {
       state.window_state_ex === 'maximized'
     );
 
-    console.log(`onWindowStateChanged:`, isOpen, state.window_state_ex);
+    console.log(`onWindowStateChanged:`, state.window_state_ex, isOpen);
 
     if (windowIsOpen !== isOpen) {
       windowIsOpen = isOpen;
