@@ -1,0 +1,10 @@
+This sample app mainly shows how to detect the second screen location and resolution and place the window correctly.
+  
+* The sample contains two windows: 
+  * native desktop-only window (with a button that "switch" it to an in-game window).
+  * in-game window. (with a button that "switch" it to a desktop window)
+* behavior on two screens mode:
+  * When the game is not running: only shows the desktop-only window on the second screen.
+  * When the game is running: the user can click on the "switch" button and convert the window from in-game to desktop and vice versa. 
+* behavior on single screens mode: only the in-game window is displayed. The "Switch" button does nothing.
+  
