@@ -5,7 +5,7 @@ Sample apps to make the OW creators' lives easier: each app demonstrates the pri
 * Download the repo to your machine.
 * Load each folder to the OW client as unpacked extension.
 
-## io-samlpe
+## second-screen-samlpe
 
 ## ads-sample
 
