@@ -1,0 +1,20 @@
+{
+  "name": "apis-sample-apps",
+  "version": "1.0.0",
+  "description": "Sample apps to make the OW creators' lives easier: each app demonstrates the primary usage in a particular API.",
+  "main": "",
+  "dependencies": {
+    "@overwolf/types": "^3.16.0"
+  },
+  "devDependencies": {},
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/overwolf/apis-sample-apps.git"
+  },
+  "author": "Overwolf",
+  "bugs": {
+    "url": "https://github.com/overwolf/apis-sample-apps/issues"
+  },
+  "homepage": "https://github.com/overwolf/apis-sample-apps#readme"
+}

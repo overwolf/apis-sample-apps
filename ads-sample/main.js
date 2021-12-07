@@ -1,14 +1,13 @@
-const WINDOW_NAME = 'main';
-
 let
-  updateWindowIsVisibleInterval = null,
+  windowInfo = null,
   windowIsOpen = false,
-  windowIsVisible = false,
   adInstance = null;
 
 async function init() {
   // Force the ads script to display a test ad, this is not intended for production
   localStorage.owAdsForceAdUnit = "Ad_test";
+
+  windowInfo = await getCurrentWindowInfo();
 
   registerListeners();
 
@@ -17,44 +16,35 @@ async function init() {
   overwolf.windows.onStateChanged.removeListener(onWindowStateChanged);
   overwolf.windows.onStateChanged.addListener(onWindowStateChanged);
 
-  windowIsVisible = await getWindowIsVisible();
-
-  updateWindowIsVisibleInterval = setInterval(updateWindowIsVisible, 2000);
+  updateAd();
 }
 
-function loadAdLib() { return new Promise((resolve, reject) => {
-  const el = document.createElement('script');
-  el.src = 'https://content.overwolf.com/libs/ads/latest/owads.min.js';
-  el.async = true;
-  el.onload = resolve;
-  el.onerror = reject;
-  document.body.appendChild(el);
-})}
-
-async function getWindowIsVisible() {
-  const state = await new Promise(resolve => {
-    overwolf.windows.isWindowVisibleToUser(resolve);
+function getCurrentWindowInfo() {
+  return new Promise((resolve, reject) => {
+    overwolf.windows.getCurrentWindow(result => {
+      if (result.success) {
+        resolve(result.window);
+      } else {
+        reject(result);
+      }
+    });
   });
-
-  const isVisible = (state && state.success && state.visible !== 'hidden');
-
-  console.log(`getWindowIsVisible():`, state.visible, isVisible);
-
-  return isVisible;
 }
 
-async function updateWindowIsVisible() {
-  const isVisible = await getWindowIsVisible();
-
-  if (windowIsVisible !== isVisible) {
-    windowIsVisible = isVisible;
-    updateAd();
-  }
+function loadAdLib() {
+  return new Promise((resolve, reject) => {
+    const el = document.createElement('script');
+    el.src = 'https://content.overwolf.com/libs/ads/latest/owads.min.js';
+    el.async = true;
+    el.onload = resolve;
+    el.onerror = reject;
+    document.body.appendChild(el);
+  });
 }
 
 async function getWindowIsOpen() {
   const state = await new Promise(resolve => {
-    overwolf.windows.getWindowState(WINDOW_NAME, resolve);
+    overwolf.windows.getWindowState(windowInfo.name, resolve);
   });
 
   if (state && state.success && state.window_state_ex) {
@@ -72,7 +62,7 @@ async function getWindowIsOpen() {
 }
 
 function onWindowStateChanged(state) {
-  if (state && state.window_state_ex && state.window_name === WINDOW_NAME) {
+  if (state && state.window_state_ex && state.window_name === windowInfo.name) {
     const isOpen = (
       state.window_state_ex === 'normal' ||
       state.window_state_ex === 'maximized'
@@ -88,7 +78,7 @@ function onWindowStateChanged(state) {
 }
 
 function updateAd() {
-  if (windowIsOpen && windowIsVisible) {
+  if (windowIsOpen) {
     createAd();
   } else {
     removeAd();
@@ -157,10 +147,10 @@ function setTab(tab) {
 }
 
 function registerListeners() {
-  document.getElementById('openMainConsole').addEventListener('click', () => {
+  document.getElementById('openConsole').addEventListener('click', () => {
     const backgroundController = overwolf.windows.getMainWindow();
 
-    backgroundController.openMainConsole();
+    backgroundController.openConsole(windowInfo.name);
   });
 
   document.querySelectorAll('.tabsSelector li').forEach(el => {
