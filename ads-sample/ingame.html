@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Ads Sample App</title>
+  <link rel="stylesheet" href="main.css" />
+</head>
+<body>
+  <ul class="tabsSelector">
+    <li data-tab="tab-1" class="active">Tab 1</li>
+    <li data-tab="tab-2">Tab 2</li>
+    <li data-tab="tab-3">Tab 3</li>
+  </ul>
+
+  <main id="tab-1" class="tabContent">
+    <p>Tab 1.</p>
+    <p>Ads Sample App.</p>
+    <p>
+      Ads should not refresh or re-render when your UI content changes,
+      for example when you switch between tabs.
+    </p>
+  </main>
+
+  <main id="tab-2" class="tabContent" hidden>
+    <p>Tab 2.</p>
+  </main>
+
+  <main id="tab-3" class="tabContent" hidden>
+    <p>Tab 3.</p>
+  </main>
+
+  <div id="adContainer"></div>
+
+  <div class="actions">
+    <button id="openConsole">Open Console</button>
+  </div>
+
+  <script src="ingame.js" type="module"></script>
+</body>
+</html>

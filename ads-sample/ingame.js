@@ -1,34 +1,22 @@
+const kWindowName = 'ingame';
+
 let
-  windowInfo = null,
   windowIsOpen = false,
+  gameInFocus = false,
   adInstance = null;
 
 async function init() {
-  // Force the ads script to display a test ad, this is not intended for production
-  localStorage.owAdsForceAdUnit = "Ad_test";
-
-  windowInfo = await getCurrentWindowInfo();
-
   registerListeners();
+
+  gameInFocus = await getGameInFocus();
+
+  overwolf.games.onGameInfoUpdated.addListener(onGameInfoUpdated);
 
   windowIsOpen = await getWindowIsOpen();
 
-  overwolf.windows.onStateChanged.removeListener(onWindowStateChanged);
   overwolf.windows.onStateChanged.addListener(onWindowStateChanged);
 
   updateAd();
-}
-
-function getCurrentWindowInfo() {
-  return new Promise((resolve, reject) => {
-    overwolf.windows.getCurrentWindow(result => {
-      if (result.success) {
-        resolve(result.window);
-      } else {
-        reject(result);
-      }
-    });
-  });
 }
 
 function loadAdLib() {
@@ -42,9 +30,37 @@ function loadAdLib() {
   });
 }
 
+async function getGameInFocus() {
+  const gameInfo = await new Promise(resolve => {
+    overwolf.games.getRunningGameInfo(resolve);
+  });
+
+  const inFocus = Boolean(gameInfo && gameInfo.isRunning && gameInfo.isInFocus);
+
+  console.log(`getGameInFocus():`, gameInfo, inFocus);
+
+  return inFocus;
+}
+
+function onGameInfoUpdated(e) {
+  const inFocus = (
+    e &&
+    e.gameInfo &&
+    e.gameInfo.isRunning &&
+    e.gameInfo.isInFocus
+  );
+
+  console.log(`onGameInfoUpdated:`, inFocus);
+
+  if (gameInFocus !== inFocus) {
+    gameInFocus = inFocus;
+    updateAd();
+  }
+}
+
 async function getWindowIsOpen() {
   const state = await new Promise(resolve => {
-    overwolf.windows.getWindowState(windowInfo.name, resolve);
+    overwolf.windows.getWindowState(kWindowName, resolve);
   });
 
   if (state && state.success && state.window_state_ex) {
@@ -62,7 +78,7 @@ async function getWindowIsOpen() {
 }
 
 function onWindowStateChanged(state) {
-  if (state && state.window_state_ex && state.window_name === windowInfo.name) {
+  if (state && state.window_state_ex && state.window_name === kWindowName) {
     const isOpen = (
       state.window_state_ex === 'normal' ||
       state.window_state_ex === 'maximized'
@@ -78,7 +94,7 @@ function onWindowStateChanged(state) {
 }
 
 function updateAd() {
-  if (windowIsOpen) {
+  if (gameInFocus && windowIsOpen) {
     createAd();
   } else {
     removeAd();
@@ -150,7 +166,7 @@ function registerListeners() {
   document.getElementById('openConsole').addEventListener('click', () => {
     const backgroundController = overwolf.windows.getMainWindow();
 
-    backgroundController.openConsole(windowInfo.name);
+    backgroundController.openConsole(kWindowName);
   });
 
   document.querySelectorAll('.tabsSelector li').forEach(el => {

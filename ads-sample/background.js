@@ -1,6 +1,9 @@
 let gameRunning = false;
 
 async function init() {
+  // Force the ads script to display a test ad, this is not intended for production
+  localStorage.owAdsForceAdUnit = "Ad_test";
+
   window.openConsole = openConsole;
 
   overwolf.extensions.onAppLaunchTriggered.addListener(openMainWindow);
@@ -8,6 +11,7 @@ async function init() {
   overwolf.games.onGameInfoUpdated.addListener(onGameInfoUpdated);
 
   gameRunning = await getGameRunningStatus();
+
   openMainWindow();
 }
 

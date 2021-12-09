@@ -26,7 +26,7 @@
         "background_optimization": false
       },
       "desktop": {
-        "file": "main.html",
+        "file": "desktop.html",
         "transparent": false,
         "resizable": true,
         "show_in_taskbar": true,
@@ -51,7 +51,7 @@
         }
       },
       "ingame": {
-        "file": "main.html",
+        "file": "ingame.html",
         "transparent": false,
         "resizable": true,
         "show_in_taskbar": false,
