@@ -22,8 +22,8 @@
   ],
   "data": {
     "start_window": "background",
-    "data": {
-      "protocol_override_domains": {"googlesyndication" : "http"}
+    "protocol_override_domains": {
+      "googlesyndication": "http"
     },
     "windows": {
       "background": {
