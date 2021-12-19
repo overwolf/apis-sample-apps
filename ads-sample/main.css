@@ -1,6 +1,6 @@
 /* Import fonts */
 
-@import url('https://fonts.googleapis.com/css2?family=Roboto&family=Roboto+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
 
 /* Reset */
@@ -92,7 +92,7 @@ body {
   position: relative;
   height: 100vh;
   line-height: 20px;
-  color: #d5d5d5;
+  color: #D6D6D6;
   background-color: #333;
   font-family: Roboto, sans-serif;
   font-size: 14px;
@@ -100,80 +100,207 @@ body {
 
 /* Styles */
 
-p {
-  margin-bottom: 15px;
-}
-b {
-  font-weight: 600;
-}
-.tabsSelector {
-  display: flex;
-  align-items: flex-start;
-  padding: 0 15px;
-  font-family: "Roboto", sans-serif;
-  font-weight: 700;
-  font-size: 12px;
-  text-transform: uppercase;
-  background: linear-gradient(to top, #464646 3px, rgba(0, 0, 0, 0.33) 3px);
-}
-.tabsSelector li {
-  display: block;
-  padding: 8px 10px 5px;
-  border-bottom: 3px solid #464646;
-  cursor: pointer;
-  transition:
-    background-color .15s ease-in-out,
-    border-bottom-color .15s ease-in-out;
-}
-.tabsSelector li:hover {
-  border-bottom-color: #5c5c5c;
-}
-.tabsSelector li.active {
-  background-color: #333;
-  border-bottom-color: #8d8d8d;
-}
-.tabContent {
-  margin: 20px 15px 0;
-}
-.actions {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
+.app-header {
   position: absolute;
-  bottom: 15px;
-  left: 15px;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  height: 30px;
+  padding-left: 13px;
+  background-color: #525252;
 }
+.app-header h1 {
+  margin-right: auto;
+  color: #D6D6D6;
+  font-size: 13px;
+  pointer-events: none;
+}
+.window-control {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  transition: background-color .15s ease-in-out;
+}
+.window-control:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.window-control.close:hover {
+  background-color: #00DEFA;
+}
+.window-control::before {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: #949494;
+  transition: background-color .15s ease-in-out;
+}
+.window-control.close::before {
+  -webkit-mask: url('images/close.svg') center center no-repeat;
+  mask: url('images/close.svg') center center no-repeat;
+}
+.window-control.maximize::before {
+  -webkit-mask: url('images/maximize.svg') center center no-repeat;
+  mask: url('images/maximize.svg') center center no-repeat;
+}
+.window-control.minimize::before {
+  -webkit-mask: url('images/minimize.svg') center center no-repeat;
+  mask: url('images/minimize.svg') center center no-repeat;
+}
+.window-control.close:hover::before {
+  background-color: #454545;
+}
+
+.tabs-navigation {
+  position: absolute;
+  top: 30px;
+  left: 0;
+  bottom: 0;
+  width: 115px;
+  padding: 15px 0;
+  background-color: #3A3A3A;
+  color: #FFFFFF;
+  font-size: 15px;
+  counter-reset: tab;
+}
+.tabs-navigation button {
+  display: block;
+  position: relative;
+  width: 100%;
+  padding: 15px 15px 15px 17px;
+  cursor: pointer;
+  transition: background-color .15s ease-in-out;
+}
+.tabs-navigation button:hover {
+  background-color: #454545;
+}
+.tabs-navigation button.active {
+  background-color: #333;
+}
+.tabs-navigation button.bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  font-size: 13px;
+}
+.tabs-navigation button[data-tab] {
+  padding-left: 60px;
+}
+.tabs-navigation button[data-tab]::before {
+  counter-increment: tab;
+  content: counter(tab, upper-alpha);
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 17px;
+  bottom: 0;
+  margin: auto;
+  width: 35px;
+  height: 35px;
+  line-height: 33px;
+  border: 1px solid transparent;
+  color: #949494;
+  background-color: #525252;
+  border-radius: 50%;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+  transition:
+    color .15s ease-in-out,
+    border-color .15s ease-in-out;
+}
+.tabs-navigation button[data-tab]:hover::before {
+  color: #D6D6D6;
+}
+.tabs-navigation button[data-tab].active::before {
+  color: #D6D6D6;
+  border-color: #D6D6D6;
+}
+
+.tab-content {
+  position: absolute;
+  top: 45px;
+  left: 130px;
+  right: 430px;
+  bottom: 0;
+  padding: 25px 20px 10px 25px;
+  overflow-y: hidden;
+  overflow-y: scroll;
+  background-color: #454545;
+}
+.tab-content::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+  background: transparent;
+}
+.tab-content::-webkit-scrollbar-thumb {
+  background-color: #606060;
+}
+.tab-content::-webkit-scrollbar-thumb:hover {
+  background-color: #949494;
+}
+.tab-content h2 {
+  margin-bottom: 15px;
+  line-height: 30px;
+  font-size: 25px;
+  color: #fff;
+}
+.tab-content h6 {
+  margin-bottom: 15px;
+  line-height: 26px;
+  font-size: 16px;
+}
+.tab-content p {
+  margin-bottom: 15px;
+  color: #8f8f8f;
+}
+
+.extra-content {
+  position: absolute;
+  top: 45px;
+  right: 15px;
+  width: 400px;
+  height: 282px;
+  padding: 25px 20px 5px 20px;
+  overflow-y: hidden;
+  overflow-y: scroll;
+  background-color: #454545;
+}
+.extra-content::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+  background: transparent;
+}
+.extra-content::-webkit-scrollbar-thumb {
+  background-color: #606060;
+}
+.extra-content::-webkit-scrollbar-thumb:hover {
+  background-color: #949494;
+}
+.extra-content h3 {
+  margin-bottom: 15px;
+  line-height: 30px;
+  font-size: 18px;
+  color: #fff;
+}
+.extra-content h6 {
+  margin-bottom: 15px;
+  line-height: 26px;
+  font-size: 16px;
+}
+.extra-content p {
+  margin-bottom: 15px;
+  color: #8f8f8f;
+}
+
 #adContainer {
   position: absolute;
-  bottom: 56px;
+  bottom: 15px;
   right: 15px;
   width: 400px;
   height: 300px;
   background: #252525 url('icons/IconMouseNormal.png') center center no-repeat;
   background-size: 120px;
-}
-button {
-  display: block;
-  margin-right: 10px;
-  padding: 6px 8px;
-  line-height: 120%;
-  color: #d5d5d5;
-  background: #3b3b3b;
-  border-radius: 2px;
-  font-family: "Roboto", sans-serif;
-  font-weight: 700;
-  font-size: 12px;
-  text-transform: uppercase;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  transition: background .15s ease-in-out;
-}
-button:hover {
-  color: #ffffff;
-  background: #8d8d8d;
-}
-button:active {
-  color: #d5d5d5;
-  background: #444;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }

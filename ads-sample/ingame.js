@@ -1,3 +1,5 @@
+import './window-controls.js'
+
 const kWindowName = 'ingame';
 
 let
@@ -149,7 +151,7 @@ function removeAd() {
 }
 
 function setTab(tab) {
-  document.querySelectorAll(`.tabsSelector li`).forEach(el => {
+  document.querySelectorAll(`[data-tab]`).forEach(el => {
     if (el.dataset.tab === tab) {
       el.classList.add('active');
     } else {
@@ -157,7 +159,7 @@ function setTab(tab) {
     }
   });
 
-  document.querySelectorAll(`.tabContent`).forEach(el => {
+  document.querySelectorAll(`.tab-content`).forEach(el => {
     el.hidden = Boolean(el.id !== tab);
   });
 }
@@ -169,7 +171,7 @@ function registerListeners() {
     backgroundController.openConsole(kWindowName);
   });
 
-  document.querySelectorAll('.tabsSelector li').forEach(el => {
+  document.querySelectorAll('[data-tab]').forEach(el => {
     el.addEventListener('click', () => {
       setTab(el.dataset.tab);
     });

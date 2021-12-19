@@ -3,7 +3,7 @@
   "type": "WebApp",
   "meta": {
     "name": "Ads Sample App",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "minimum-overwolf-version": "0.165.0",
     "author": "Overwolf",
     "icon": "icons/IconMouseOver.png",
@@ -14,10 +14,11 @@
   },
   "data": {
     "start_window": "background",
-    "data": {
-      "protocol_override_domains": {
-        "googlesyndication": "http"
-      }
+    "protocol_override_domains": {
+      "googlesyndication": "http"
+    },
+    "game_targeting": {
+      "type": "all"
     },
     "windows": {
       "background": {
@@ -27,7 +28,8 @@
       },
       "desktop": {
         "file": "desktop.html",
-        "transparent": false,
+        "transparent": true,
+        "native_window": true,
         "resizable": true,
         "show_in_taskbar": true,
         "desktop_only": true,
@@ -38,12 +40,12 @@
         "popup_blocker": true,
         "mute": true,
         "size": {
-          "width": 452,
-          "height": 600
+          "width": 1212,
+          "height": 656
         },
         "min_size": {
-          "width": 452,
-          "height": 600
+          "width": 1212,
+          "height": 656
         },
         "start_position": {
           "top": 300,
@@ -52,7 +54,7 @@
       },
       "ingame": {
         "file": "ingame.html",
-        "transparent": false,
+        "transparent": true,
         "resizable": true,
         "show_in_taskbar": false,
         "restrict_to_game_bounds": true,
@@ -63,12 +65,12 @@
         "popup_blocker": true,
         "mute": true,
         "size": {
-          "width": 452,
-          "height": 600
+          "width": 1212,
+          "height": 656
         },
         "min_size": {
-          "width": 452,
-          "height": 600
+          "width": 1212,
+          "height": 656
         },
         "start_position": {
           "top": 300,
