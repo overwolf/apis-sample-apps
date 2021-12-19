@@ -261,8 +261,8 @@ body {
   position: absolute;
   top: 45px;
   right: 15px;
+  bottom: 330px;
   width: 400px;
-  height: 282px;
   padding: 25px 20px 5px 20px;
   overflow-y: hidden;
   overflow-y: scroll;
