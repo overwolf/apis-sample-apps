@@ -3,6 +3,7 @@ import './window-controls.js'
 const kWindowName = 'ingame';
 
 let
+  adEnabled = false,
   windowIsOpen = false,
   gameInFocus = false,
   adInstance = null;
@@ -10,13 +11,13 @@ let
 async function init() {
   registerListeners();
 
-  gameInFocus = await getGameInFocus();
-
   overwolf.games.onGameInfoUpdated.addListener(onGameInfoUpdated);
 
-  windowIsOpen = await getWindowIsOpen();
-
   overwolf.windows.onStateChanged.addListener(onWindowStateChanged);
+
+  gameInFocus = await getGameInFocus();
+
+  windowIsOpen = await getWindowIsOpen();
 
   updateAd();
 }
@@ -96,10 +97,16 @@ function onWindowStateChanged(state) {
 }
 
 function updateAd() {
-  if (gameInFocus && windowIsOpen) {
-    createAd();
-  } else {
-    removeAd();
+  const shouldEnable = (windowIsOpen && gameInFocus);
+
+  if (adEnabled !== shouldEnable) {
+    adEnabled = shouldEnable;
+
+    if (shouldEnable) {
+      createAd();
+    } else {
+      removeAd();
+    }
   }
 }
 

@@ -3,6 +3,7 @@ import './window-controls.js'
 const kWindowName = 'desktop';
 
 let
+  adEnabled = false,
   updateWindowIsVisibleInterval = null,
   windowIsOpen = false,
   windowIsVisible = false,
@@ -11,13 +12,13 @@ let
 async function init() {
   registerListeners();
 
-  windowIsOpen = await getWindowIsOpen();
-
   overwolf.windows.onStateChanged.addListener(onWindowStateChanged);
 
-  windowIsVisible = await getWindowIsVisible();
-
   updateWindowIsVisibleInterval = setInterval(updateWindowIsVisible, 2000);
+
+  windowIsOpen = await getWindowIsOpen();
+
+  windowIsVisible = await getWindowIsVisible();
 
   updateAd();
 }
@@ -87,10 +88,16 @@ function onWindowStateChanged(state) {
 }
 
 function updateAd() {
-  if (windowIsOpen && windowIsVisible) {
-    createAd();
-  } else {
-    removeAd();
+  const shouldEnable = (windowIsOpen && windowIsVisible);
+
+  if (adEnabled !== shouldEnable) {
+    adEnabled = shouldEnable;
+
+    if (shouldEnable) {
+      createAd();
+    } else {
+      removeAd();
+    }
   }
 }
 
