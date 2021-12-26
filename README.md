@@ -10,7 +10,7 @@ Sample apps to make the OW creators' lives easier: each app demonstrates the pri
 ## ads-sample
 
 This is an elementary sample app for ads.
-The app contains one desktop window with an ad. When this window is hidden or minimized, the ad is removed.
+With it you'll be able to demonstrate how to display an ad, in an in-game window or desktop window, when to hide it, when to restore it, etc.
 
 ## subscription-sample
 
